@@ -78,3 +78,4 @@ AI was used to:
 1. Finding commands flags
 2. Get quick answers on how Docker and the different modules work
 3. Format markdown
+4. Checking files for inconsistencies / potential enhancements

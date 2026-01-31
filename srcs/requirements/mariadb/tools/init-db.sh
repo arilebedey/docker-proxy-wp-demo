@@ -5,7 +5,7 @@ read_secret() {
 }
 
 DB_ROOT_PASS=$(read_secret db_root_password)
-DB_USER_PASS=$(read_secret db_password)
+DB_USER_PASS=$(read_secret wp_password)
 
 if [ -z "$DB_ROOT_PASS" ] || [ -z "$DB_USER_PASS" ]; then
     echo "Error: Missing required secrets."
