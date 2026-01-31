@@ -20,10 +20,6 @@ clean: down
 	docker run --rm -v mariadb_data:/data alpine sh -c "rm -rf /data/*" 2>/dev/null || true
 	docker run --rm -v wordpress_data:/data alpine sh -c "rm -rf /data/*" 2>/dev/null || true
 
-fclean: clean
-	docker run --rm -v mariadb_data:/data alpine sh -c "rm -rf /data/*" 2>/dev/null || true
-	docker run --rm -v wordpress_data:/data alpine sh -c "rm -rf /data/*" 2>/dev/null || true
-
 re: fclean all
 
 .PHONY: all setup build up down clean fclean re
