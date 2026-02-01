@@ -21,4 +21,7 @@ clean: down
 
 re: clean all
 
+nuke docker: clean
+	docker system prune -a --volumes -f
+
 .PHONY: all setup build up down clean re
