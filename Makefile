@@ -17,8 +17,7 @@ down:
 
 clean: down
 	docker compose -f srcs/docker-compose.yml down -v --rmi all
-	docker run --rm -v mariadb_data:/data alpine sh -c "rm -rf /data/*" 2>/dev/null || true
-	docker run --rm -v wordpress_data:/data alpine sh -c "rm -rf /data/*" 2>/dev/null || true
+	sudo rm -rf $(HOME)/data
 
 re: fclean all
 
