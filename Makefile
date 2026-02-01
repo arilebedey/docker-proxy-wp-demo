@@ -19,6 +19,6 @@ clean: down
 	docker compose -f srcs/docker-compose.yml down -v --rmi all
 	sudo rm -rf $(HOME)/data
 
-re: fclean all
+re: clean all
 
-.PHONY: all setup build up down clean fclean re
+.PHONY: all setup build up down clean re
