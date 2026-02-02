@@ -1,26 +1,21 @@
-FROM debian:bullseye
+FROM alpine:3.22.0
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates php7.4-fpm php7.4-mysql curl tar mariadb-client dumb-init \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add --no-cache \
+    php83 php83-fpm php83-mysqli php83-json php83-curl php83-dom \
+    php83-mbstring php83-xml php83-zip php83-openssl php83-phar php83-pecl-redis \
+    php83-tokenizer php83-xmlwriter php83-simplexml php83-ctype \
+    bash curl wget mariadb-client
 
-WORKDIR /var/www/html
-
-RUN update-ca-certificates
-
-RUN curl -O https://wordpress.org/latest.tar.gz \
-    && tar -xzf latest.tar.gz --strip-components=1 \
-    && rm latest.tar.gz \
-    && chown -R www-data:www-data /var/www/html
-
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
     && chmod +x wp-cli.phar \
     && mv wp-cli.phar /usr/local/bin/wp
 
-COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
-COPY tools/setup.sh /usr/local/bin/setup.sh
-RUN chmod +x /usr/local/bin/setup.sh
+RUN sed -i 's/memory_limit = 128M/memory_limit = 512M/' /etc/php83/php.ini
 
-EXPOSE 9000
+COPY tools/wordpress.sh /usr/bin/wordpress.sh
 
-ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/setup.sh"]
+RUN chmod +x /usr/bin/wordpress.sh
+
+EXPOSE 9000/tcp
+
+ENTRYPOINT ["wordpress.sh"]
