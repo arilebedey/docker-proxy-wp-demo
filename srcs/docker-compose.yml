@@ -42,8 +42,8 @@ services:
     depends_on:
       - wordpress
     restart: always
-    env_file:
-      - .env
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
     volumes:
       - wordpress_data:/var/www/html:ro
     networks:

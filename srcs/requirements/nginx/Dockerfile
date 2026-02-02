@@ -1,12 +1,15 @@
-FROM debian:bullseye
+FROM alpine:3.22.0
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    nginx openssl dumb-init && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add --no-cache nginx openssl gettext
 
-COPY conf/nginx.conf /etc/nginx/conf.d/default.conf
-COPY tools/setup_tls.sh /usr/local/bin/setup_tls.sh
-RUN chmod +x /usr/local/bin/setup_tls.sh
+ARG DOMAIN_NAME
 
-EXPOSE 443
+COPY tools/ssl.sh /usr/bin/ssl.sh
+RUN chmod +x /usr/bin/ssl.sh && /usr/bin/ssl.sh "$DOMAIN_NAME"
 
-ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/setup_tls.sh"]
+COPY tools/entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+
+COPY conf/nginx.conf /etc/nginx/http.d/default.conf.template
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
