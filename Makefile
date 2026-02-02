@@ -17,7 +17,7 @@ down:
 
 clean: down
 	docker compose -f srcs/docker-compose.yml down -v --rmi all
-	sudo rm -rf $(HOME)/data
+	rm -rf $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress
 
 re: clean all
 
