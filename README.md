@@ -75,7 +75,7 @@ make re       # Restart everything (clean + all)
 
 AI was used to:
 
-1. Finding commands flags
+1. Find commands flags, getting a first grasp on configurations during research
 2. Get quick answers on how Docker and the different modules work
-3. Format markdown
-4. Checking files for inconsistencies / potential enhancements
+3. Format markdown and redact parts of the documentation
+4. Check files for inconsistencies / potential enhancements / obvious errors

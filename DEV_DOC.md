@@ -51,12 +51,8 @@ volumes:
 
 ```50-server.cnf
 [mysqld]
-datadir = /var/lib/mysql
-socket  = /var/run/mysqld/mysqld.sock
 bind-address = 0.0.0.0
 port = 3306
-user = mysql
-skip-networking = false
 ```
 
 `bind-address = 0.0.0.0`: listen on all available network interfaces (docker network)
@@ -164,7 +160,7 @@ That makes PHP‑FPM run as PID 1 inside the container.
 
 # nginx
 
-Nginx examines the request using its configuration (e.g. /etc/nginx/conf.d/default.conf) and says:
+nginx is a web server — it serves static files and routes requests
 
 When nginx encounters a .php file, it forwards the request to that port or socket.
 
@@ -201,3 +197,48 @@ Both TLSv1.2 and TLSv1.3 require strong ciphers, thus we write
 - algorithms used are high security (>128-bit encryption)
 - exclude anonymouse insecure cypher (allow MITM attacks)
 - MD5, being cryptographically broken, must never be used for secure data integrity
+
+### `nginx` options
+
+**`include fastcgi_params;`** — loads nginx's standard FastCGI parameter file. This sets variables that PHP-FPM needs:
+
+- `REQUEST_METHOD` (GET, POST, etc.)
+- `QUERY_STRING` (the `?foo=bar` part)
+- `SCRIPT_NAME`, `SCRIPT_FILENAME`
+- `SERVER_NAME`, `SERVER_PORT`
+- HTTP headers, cookies, etc.
+
+**`fastcgi_split_path_info ^(.+\.php)(/.*)$;`** — splits the request path into two parts using regex:
+
+**Regex breakdown:**
+
+- `^(.+\.php)` — Capture group 1: everything up to and including `.php`
+- `(/.*)$` — Capture group 2: everything after `.php` (starting with `/`)
+
+**Example:**
+
+```
+Request: /index.php/extra/path
+
+Captures:
+  $fastcgi_script_name = /index.php
+  $fastcgi_path_info = /extra/path
+```
+
+**Why it matters:**
+
+- `$fastcgi_script_name` → passed to `SCRIPT_FILENAME` (which file to execute)
+- `$fastcgi_path_info` → passed to `PATH_INFO` (extra path data for the script)
+
+PHP uses `PATH_INFO` for routing. WordPress can then use it to determine which post/page to load, even though the actual file being executed is always `index.php`.
+
+Without this, requests like `/index.php/about/` would fail because nginx wouldn't properly separate the script from the path info.
+
+#### Example
+
+Request: https://alebedev.42.fr/blog/
+nginx rewrites to: /index.php
+fastcgi_split_path_info extracts: $fastcgi_script_name = /index.php
+fastcgi_param sets: SCRIPT_FILENAME = /srv/www/wordpress/index.php
+PHP-FPM receives: "Execute /srv/www/wordpress/index.php"
+PHP runs index.php, which handles WordPress routing
