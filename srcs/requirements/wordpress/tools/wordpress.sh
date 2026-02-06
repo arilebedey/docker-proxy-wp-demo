@@ -4,7 +4,8 @@ read_secret() {
     cat "$1" 2>/dev/null || echo ""
 }
 
-MYSQL_PASSWORD=$(read_secret "${MYSQL_PASSWORD_FILE}")
+MYSQL_ADMIN_PASSWORD=$(read_secret "${MYSQL_ADMIN_PASSWORD_FILE}")
+MYSQL_USER_PASSWORD=$(read_secret "${MYSQL_USER_PASSWORD_FILE}")
 WP_ADMIN_PASSWORD=$(read_secret "${WP_ADMIN_PASSWORD_FILE}")
 WP_USER_PASSWORD=$(read_secret "${WP_USER_PASSWORD_FILE}")
 
@@ -24,8 +25,8 @@ if [ ! -f wp-config.php ]; then
     wp core download --allow-root
     wp config create \
         --dbname="${MYSQL_DATABASE}" \
-        --dbuser="${MYSQL_USER}" \
-        --dbpass="${MYSQL_PASSWORD}" \
+        --dbuser="${MYSQL_ADMIN}" \
+        --dbpass="${MYSQL_ADMIN_PASSWORD}" \
         --dbhost="${MYSQL_HOST}" \
         --allow-root
 
@@ -39,7 +40,7 @@ if [ ! -f wp-config.php ]; then
 
     wp user create \
         "${WP_USER}" \
-        "${WP_EMAIL}" \
+        "${WP_USER_EMAIL}" \
         --user_pass="${WP_USER_PASSWORD}" \
         --role=editor \
         --allow-root

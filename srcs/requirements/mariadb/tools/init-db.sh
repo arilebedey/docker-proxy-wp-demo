@@ -4,10 +4,11 @@ read_secret() {
     cat "/run/secrets/$1" 2>/dev/null || echo ""
 }
 
-DB_ROOT_PASS=$(read_secret db_root_password)
-DB_USER_PASS=$(read_secret wp_password)
+DB_ROOT_PASS=$(read_secret db_password)
+DB_ADMIN_PASS=$(read_secret wp_admin_password)
+DB_USER_PASS=$(read_secret wp_user_password)
 
-if [ -z "$DB_ROOT_PASS" ] || [ -z "$DB_USER_PASS" ]; then
+if [ -z "$DB_ROOT_PASS" ] || [ -z "$DB_USER_PASS" ] || [ -z "$DB_ADMIN_PASS" ]; then
     echo "Error: Missing required secrets."
     exit 1
 fi
@@ -23,16 +24,16 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
 
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
 
-CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${DB_USER_PASS}';
-GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+CREATE USER IF NOT EXISTS '${MYSQL_ADMIN}'@'%' IDENTIFIED BY '${DB_ADMIN_PASS}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_ADMIN}'@'%';
 
-CREATE USER IF NOT EXISTS '${MYSQL_SECOND_USER}'@'%' IDENTIFIED BY '${DB_USER_PASS}';
-GRANT SELECT, INSERT, UPDATE ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_SECOND_USER}'@'%';
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${DB_USER_PASS}';
+GRANT SELECT, INSERT, UPDATE ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 
 FLUSH PRIVILEGES;
 EOF
 
-    echo "Database initialized with users: root, ${MYSQL_USER}, ${MYSQL_SECOND_USER}"
+    echo "Database initialized with users: root, ${MYSQL_ADMIN}, ${MYSQL_USER}"
 else
     echo "Database already exists. Skipping initialization."
 fi

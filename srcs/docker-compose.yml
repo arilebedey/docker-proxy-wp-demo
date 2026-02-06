@@ -8,8 +8,9 @@ services:
     env_file:
       - .env
     secrets:
-      - db_root_password
-      - wp_password
+      - db_password
+      - wp_admin_password
+      - wp_user_password
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -27,7 +28,8 @@ services:
     env_file:
       - .env
     secrets:
-      - wp_password
+      - wp_admin_password
+      - wp_user_password
     volumes:
       - wordpress_data:/srv/www/wordpress
     networks:
@@ -54,10 +56,12 @@ services:
       - "443:443"
 
 secrets:
-  db_root_password:
-    file: ../secrets/db_root_password.txt
-  wp_password:
-    file: ../secrets/wp_password.txt
+  db_password:
+    file: ../secrets/db_password.txt
+  wp_user_password:
+    file: ../secrets/wp_user_password.txt
+  wp_admin_password:
+    file: ../secrets/wp_admin_password.txt
 
 volumes:
   mariadb_data:
