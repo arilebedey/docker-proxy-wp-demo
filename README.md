@@ -37,6 +37,22 @@ Both allow us to persist data after the container stops or deletes.
 
 Named volumes work the same on Linux, Mac, Windows. Bind mounts have OS-specific path issues and hard-coded paths break when teammates use different machines. Bind mounts are a convenience and don't need volume definition in compose file. They should not be used in production.
 
+# Additional details
+
+## Docker vs Docker Compose
+
+Without Docker Compose: You manually execute docker build and docker run commands. You are responsible for remembering every flag (like -p for ports, -v for volumes) every time you run the container. This is tedious for complex stacks.
+
+With Docker Compose: The configuration (ports, networks, volumes) is declared in the YAML file. Docker Compose automates the process, ensuring that every time you run docker compose up, the container starts with the exact same settings and connects correctly to the other services.
+
+## How Docker achieves working on all major platform
+
+Docker Desktop on Windows and macOS runs a lightweight Linux virtual machine in the background (using WSL2 or HyperKit), so all containers actually execute within a Linux environment regardless of the host OS; on Linux hosts, containers run directly using the shared kernel, ensuring consistent behavior across all platforms since the application always sees the same Linux runtime.
+
+### What is a Docker Network
+
+A Docker network acts like a private internal communication channel between containers. When you place multiple services on the same network, they can talk to each other by name (e.g., `wordpress`) without being accessible from the outside world. This provides security and simplifies configuration.
+
 # Instructions
 
 ```

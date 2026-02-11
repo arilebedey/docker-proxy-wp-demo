@@ -45,6 +45,8 @@ if [ ! -f wp-config.php ]; then
         --role=editor \
         --allow-root
 
+    wp cap remove editor delete_others_posts --allow-root
+
     wp config set DB_USER "${MYSQL_USER}" --allow-root
     wp config set DB_PASSWORD "${MYSQL_USER_PASSWORD}" --allow-root
 fi
