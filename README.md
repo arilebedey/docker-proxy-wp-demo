@@ -49,9 +49,37 @@ With Docker Compose: The configuration (ports, networks, volumes) is declared in
 
 Docker Desktop on Windows and macOS runs a lightweight Linux virtual machine in the background (using WSL2 or HyperKit), so all containers actually execute within a Linux environment regardless of the host OS; on Linux hosts, containers run directly using the shared kernel, ensuring consistent behavior across all platforms since the application always sees the same Linux runtime.
 
+## Docker named volume with bind mount and mount options
+
+It appears in `docker network ls` and is managed by docker. Only docker or sudo can delete it from host.
+
+`"type": "none"` with `"o": "bind"` creates a bind mount that directly links a host directory (like `/home/alebedev/data/wordpress`) to the volume, bypassing Docker's managed storage. The `local` driver handles this type of volume natively, while external plugins are third-party storage drivers (like `nfs`, `btrfs`, or cloud storage providers) that extend Docker to support specialized filesystems and remote storage backends.
+
+The type field specifies the filesystem type or mount mechanism Docker should use to access the storage device (e.g., nfs, ext4, xfs).
+
+`o` stands for "options" passed to underlying `mount` command and configures specific mount behaviorsi like `ro` (read-only), `rw` (read-write), `addr=IP`.
+
+Another volume could look like this:
+
+```yaml
+volumes:
+  example:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.40.0.199,nolock,soft,rw"
+      device: ":/docker/example"
+```
+
 ### What is a Docker Network
 
 A Docker network acts like a private internal communication channel between containers. When you place multiple services on the same network, they can talk to each other by name (e.g., `wordpress`) without being accessible from the outside world. This provides security and simplifies configuration.
+
+### Why not just use root for WordPress?
+
+- Principle of least privilege
+- Reduce attack surface
+- Prevent full DB compromise if WordPress is exploited
+- Separation of concerns
 
 # Instructions
 
@@ -92,6 +120,6 @@ make re       # Restart everything (clean + all)
 AI was used to:
 
 1. Find commands flags, getting a first grasp on configurations during research
-2. Get quick answers on how Docker and the different modules work
+2. Get information on how Docker and the different modules work
 3. Format, and structure markdown files and redact parts of the documentation
 4. Check files for inconsistencies / potential enhancements / errors

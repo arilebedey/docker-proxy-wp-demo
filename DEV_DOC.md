@@ -60,6 +60,16 @@ docker volume ls                                       # List volumes
 docker volume inspect inception_mariadb_data           # Volume details
 ```
 
+## Accessing the DB
+
+```sh
+docker exec -it mariadb mariadb -u user -p -h localhost
+```
+
+This runs the MariaDB client inside the container named `mariadb` to connect to the database as the root user, with `-it` enabling interactive terminal access and `-p` prompting for the password.
+
+Checking that users were created: `SELECT user, host FROM mysql.user;`
+
 ## Data Persistence
 
 Both named volumes bind data to `/home/alebedev/data`:
