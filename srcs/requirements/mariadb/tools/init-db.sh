@@ -13,12 +13,15 @@ if [ -z "$DB_ROOT_PASS" ] || [ -z "$DB_USER_PASS" ] || [ -z "$DB_ADMIN_PASS" ]; 
     exit 1
 fi
 
-if [ ! -d "/var/lib/mysql/$MYSQL_DATABASE" ]; then
+if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "Initializing MariaDB data directory..."
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
     mysqld --user=mysql --bootstrap << EOF
 FLUSH PRIVILEGES;
+
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost');
 
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
 
